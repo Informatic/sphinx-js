@@ -237,11 +237,11 @@ class Analyzer:
             get_signature = node.get('getSignature')
             if get_signature:
                 # There's no signature to speak of for a getter: only a return type.
-                type = get_signature[0]['type']
+                type = get_signature['type']
             else:
                 # ES6 says setters have exactly 1 param. I'm not sure if they
                 # can have multiple signatures, though.
-                type = node['setSignature'][0]['parameters'][0]['type']
+                type = node['setSignature']['parameters'][0]['type']
             ir = Attribute(
                 type=self._type_name(type),
                 **member_properties(node),
