@@ -494,12 +494,16 @@ def make_path_segments(node, base_dir, child_was_static=None):
 
     # Handle the cases here that are handled in _convert_node(), plus any that
     # are encountered on other nodes on the way up to the root.
-    if kindString in ['Variable', 'Property', 'Accessor', 'Interface', 'Module'] or kind in [0x20, 0x400, 0x40000, 0x100, 0x2]:
+    if kindString in ['Variable', 'Property', 'Accessor', 'Interface'] or kind in [0x20, 0x400, 0x40000, 0x100]:
         # We emit a segment for a Method's child Call Signature but skip the
         # Method itself. They 2 nodes have the same names, but, by taking the
         # child, we fortuitously end up without a trailing delimiter on our
         # last segment.
         segments = [node['name']]
+    elif kindString in ['Module'] or kind in [0x2]:
+        segments = node['name'].split(sep)
+        filename = splitext(segments[-1])[0]
+        segments = [s + '/' for s in segments[:-1]] + [filename]
     elif kindString in ['Call signature', 'Constructor signature'] or kind in [0x1000, 0x4000]:
         # Similar to above, we skip the parent Constructor and glom onto the
         # Constructor Signature. That gets us no trailing delimiter. However,
