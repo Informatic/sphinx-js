@@ -2,7 +2,7 @@
 
 from codecs import getreader
 from errno import ENOENT
-from json import load
+from json import load, dumps
 from os.path import basename, join, normpath, relpath, sep, splitext
 from pathlib import Path
 from platform import node
@@ -309,6 +309,8 @@ class Analyzer:
         if type_of_type == 'reference' and type.get('id'):
             node = self._index[type['id']]
             name = node['name']
+        elif type_of_type == 'query' and type.get('queryType', {}).get('type') == 'reference':
+            name = type['queryType']['name']
         elif type_of_type == 'unknown':
             if re.match(r'-?\d*(\.\d+)?', type['name']):  # It's a number.
                 # TypeDoc apparently sticks numeric constants' values into the
@@ -318,8 +320,8 @@ class Analyzer:
                 name = type['name']
         elif type_of_type in ['intrinsic', 'reference']:
             name = type['name']
-        elif type_of_type == 'stringLiteral':
-            name = '"' + type['value'] + '"'
+        elif type_of_type == 'stringLiteral' or type_of_type == 'literal':
+            name = dumps(type['value'])
         elif type_of_type == 'array':
             name = self._type_name(type['elementType']) + '[]'
         elif type_of_type == 'tuple' and type.get('elements'):
